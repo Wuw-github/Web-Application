@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block body %}
+  <head>
+    <title>Budget</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+  </head>
+  <body>
+    <h2 id="head"></h2>
+    <table id="catTable">
+    </table>
+    Uncategorized: <input type="text" id="uncat" value='0' readonly="readonly" size="7">
+    <div class="row">
+      <div class="column">
+        <h3> Add new category: </h3>
+        <form name="catForm">
+          <dl>
+            <dt>Title:
+            <dd><input type="text" id="title" value="" />
+            <dt>Budget:
+            <dd><input type="text" id="budget" value="" />
+          </dl>
+          <input type="button" id="catButton" value="submit" />
+        </form>
+      </div>
+      <div class="column">
+        <h3> Add new purchase: </h3>
+        <form name="purForm">
+          <dl>
+            <dt>Category:
+            <dd><input type="text" id="category" value="" />
+            <dt>Amount:
+            <dd><input type="text" id="amount" value="" />
+            <dt>Description:
+            <dd><input type="text" id="description" value="" />
+            <dt>date [dd/mm/yyyy]:
+            <dd><input type="text" id="date" value="" />
+          </dl>
+          <input type="button" id="purButton" value="submit" />
+        </form>
+      </div>
+    </div>
+  </body>
+{% endblock %}

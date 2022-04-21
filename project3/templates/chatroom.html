@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Chats{% endblock %}
+{% block body %}
+    <div class="my-header">
+      <h2>Welcome to the room: {{ title }}</h2>
+      <span><a href="{{ url_for('leaveroom') }}"> leave room </a></span>
+    </div>
+    <div style="clear:both"></div>
+  <head>
+    <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+  </head>
+  {% if error %}<div class="error"><strong>Error:</strong> {{ error }}</div>{% endif %}
+  <table id="theTable">
+    {% for message in messages %}
+      <tr> 
+        <td> {{ message.sender.username }}: </td>
+        <td> {{ message.content }} </td>
+        <td> {{ message.time }} </td>
+      </tr>
+    {% else %}
+      <tr id="noMessage" style="background: white">
+        <td><em>No message</em></td>
+      </tr>
+    {% endfor %}
+  </table>
+    <form name="theForm">
+      <input type="text" id="newcontent" name="newcontent" style="width: 300px" value=""/>
+      <input type="button" id="submitButton" value="Submit" />
+    </form>
+{% endblock %}

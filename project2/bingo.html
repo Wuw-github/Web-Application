@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>BINGO Game</title>
+		<link rel="stylesheet" rev="stylesheet" href="style.css" />
+		<script type="text/javascript">
+			var game_begin = false;
+			function randomNumber(low, high) {
+				return Math.floor(Math.random() * (high - low)) + low;
+			}
+
+			function initRandom() {
+				clear();
+				var usedNum = new Array(76).fill(false);
+				for(var i = 1; i <= 25; i++){
+					var cur = "s" + i;
+					var htmlElement = document.getElementById(cur);
+					if(htmlElement != null){
+						var low = Math.floor((i - 1) % 5) * 15 + 1;
+						var value;
+						do{
+							value = randomNumber(low, low + 15);
+						}while(usedNum[value])
+						usedNum[value] = true;
+						htmlElement.innerHTML = value;
+					}
+				}
+				button_have_value();
+			}
+
+			function regex(letter) {
+				if(letter == "N"){
+					return /[Nn]\((\d+,\d+,[fF],\d+,\d+)\)/;
+				}
+				else{
+					letter = letter + letter.toLowerCase();
+					return new RegExp("["+letter + "]" + "\\((\\d+,\\d+,\\d+,\\d+,\\d+)\\)");
+				}
+			}
+
+			function initSpecified() {
+				clear();
+				var usedNum = new Array(76).fill(false);
+				var letters = new Array("B", "I", "N", "G", "O");
+				var response = prompt("Please input your value");
+
+				for(var j = 0; j < 5; j++) {
+					var reg = regex(letters[j]);
+					var curBlock = response.match(reg);
+					if(curBlock == null) {alert("not matched"); clear(); return;}
+					curBlock = curBlock[1].split(",");
+					for(var i = 0; i < 5; i++) {
+						if(curBlock[i] == "f" || curBlock[i] == "F") {continue;}
+						n = parseInt(curBlock[i], 10);
+						var low = j * 15 + 1;
+						if(n < low || n > (low + 15) || usedNum[n]) {
+							alert("Please follow the input format");
+							clear();
+							return;
+						}
+						usedNum[n] = true;
+						var curCell = "s" + (5 * i + j + 1);
+						var element = document.getElementById(curCell);
+						element.innerHTML = n;
+					}
+				}
+				button_have_value();
+			}
+
+			function clickCell() {
+				if(game_begin) {
+					var col = window.event.target.cellIndex;
+					var row = window.event.target.parentNode.rowIndex;
+					if(row == 0){return;}
+					var cellId = "s" + ((row - 1) * 5 + col + 1);
+					var cellElement = document.getElementById(cellId);
+					if(cellElement == null) {return;}
+					if(cellElement.style.backgroundColor == "darkorange"){
+						cellElement.style.backgroundColor = "white";
+					}
+					else{
+						cellElement.style.backgroundColor = "darkorange";
+					}
+					if(checkWon()) {
+						alert("BINGO!");
+					}
+				}
+				
+			}
+
+			function clear(){
+				for(var i = 1; i <= 25; i++) {
+					var cur = "s" + i;
+					var element = document.getElementById(cur);
+					if(element != null){
+						element.innerHTML = "&nbsp";
+						element.style.backgroundColor = "white";
+					}
+				}
+				button_no_value();
+			}
+
+			function checkWon() {
+				//check horizontal
+				var won = false;
+				Loop1:
+				for(var i = 0; i < 5; i++) {
+					Loop2:
+					for(var j = 1; j <= 5; j++) {
+						var curCell = "s" + (i * 5 + j);
+						var element = document.getElementById(curCell);
+						if(element != null){
+							if(element.style.backgroundColor != "darkorange") {
+								continue Loop1;
+							}
+						}
+					}
+					won = true;
+					break;
+				}
+				if(won) {return true;}
+
+				//check vertical
+				Loop1:
+				for(var i = 1; i <= 5; i++) {
+					Loop2:
+					for(var j = 0; j <= 4; j++) {
+						var curCell = "s" + (i + 5 * j);
+						var element = document.getElementById(curCell);
+						if(element != null){
+							if(element.style.backgroundColor != "darkorange") {
+								continue Loop1;
+							}
+						}
+					}
+					won = true;
+					break;
+				}
+				if(won) {return true;}
+
+				//check diagonal
+				won = true;
+				for(var i = 0; i < 5; i++){
+					var curCell = "s" + (i * 6 + 1);
+					var element = document.getElementById(curCell);
+					if(element != null){
+						if(element.style.backgroundColor != "darkorange") {
+							won = false;
+						}
+					}
+				}
+				if(won) {return true;}
+
+				won = true;
+				for(var i = 0; i < 5; i++) {
+					var curCell = "s" + (5 + i * 4);
+					var element = document.getElementById(curCell);
+					if(element != null){
+						if(element.style.backgroundColor != "darkorange") {
+							won = false;
+						}
+					}
+				}
+				return won;
+			}
+
+			function i_won_click(){
+				if(checkWon()){
+					alert("You win the game!");
+					won();
+				}
+				else{
+					alert("You do not win the game");
+					lost();
+				}
+			}
+
+			function won() {
+				var element = document.getElementById("won");
+				var cur = parseInt(element.value, 10) + 1;
+				element.value = cur;
+
+				if(typeof(Storage) !== "undefined") {
+					localStorage.setItem("won_time", cur);
+				}
+				clear();
+			}
+
+			function lost() {
+				var element = document.getElementById("lost");
+				var cur = parseInt(element.value, 10) + 1;
+				element.value = cur;
+
+				if(typeof(Storage) !== "undefined") {
+					localStorage.setItem("lost_time", cur);
+				}
+				clear();
+			}
+
+			function pageLoad() {
+				button_no_value();
+				readLocalData();
+			}
+			
+			function readLocalData() {
+				if(typeof(Storage) !== "undefined") {
+					console.log(localStorage.getItem("won_time"));
+					var won_time = localStorage.getItem("won_time");
+					var lost_time = localStorage.getItem("lost_time");
+					if(won_time == null) {won_time = 0;}
+					if(lost_time == null) {lost_time = 0;}
+					var won_box = document.getElementById("won");
+					var lost_box = document.getElementById("lost");
+					won_box.value = won_time;
+					lost_box.value = lost_time;
+				}else{
+					alert("Web browser does not support local storage...");
+				}
+			}
+
+			function button_no_value() {
+				var won_button = document.getElementById("won_button");
+				var lost_button = document.getElementById("lost_button");
+				won_button.style.visibility = "hidden";
+				lost_button.style.visibility = "hidden";
+
+				var random = document.getElementById("new_game_random");
+				var specify = document.getElementById("new_game_specify");
+				random.style.visibility = "visible";
+				specify.style.visibility = "visible";
+				game_begin = false;
+			}
+
+			function button_have_value() {
+				var won_button = document.getElementById("won_button");
+				var lost_button = document.getElementById("lost_button");
+				won_button.style.visibility = "visible";
+				lost_button.style.visibility = "visible";
+
+				var random = document.getElementById("new_game_random");
+				var specify = document.getElementById("new_game_specify");
+				random.style.visibility = "hidden";
+				specify.style.visibility = "hidden";
+				game_begin = true;
+			}
+
+		</script>
+	</head>
+	<body>
+		<h1> BINGO Card</h1> 
+		<div class="row">
+			<div class="column">
+				<table id = "theTable">
+					<tr>
+						<th width="20%"> B </th>
+						<th width="20%"> I </th>
+						<th width="20%"> N </th>
+						<th width="20%"> G </th>
+						<th width="20%"> O </th>
+					</tr>
+		
+					<tr id="row1">
+						<td id="s1">&nbsp;</td>
+						<td id="s2">&nbsp;</td>
+						<td id="s3">&nbsp;</td>
+						<td id="s4">&nbsp;</td>
+						<td id="s5">&nbsp;</td>
+					</tr>
+					<tr id="row2">
+						<td id="s6">&nbsp;</td>
+						<td id="s7">&nbsp;</td>
+						<td id="s8">&nbsp;</td>
+						<td id="s9">&nbsp;</td>
+						<td id="s10">&nbsp;</td>
+					</tr>
+					<tr id="row3">
+						<td id="s11">&nbsp;</td>
+						<td id="s12">&nbsp;</td>
+						<td id="free">free</td>
+						<td id="s14">&nbsp;</td>
+						<td id="s15">&nbsp;</td>
+					</tr>
+					<tr id="row4">
+						<td id="s16">&nbsp;</td>
+						<td id="s17">&nbsp;</td>
+						<td id="s18">&nbsp;</td>
+						<td id="s19">&nbsp;</td>
+						<td id="s20">&nbsp;</td>
+					</tr>
+					<tr id="row5">
+						<td id="s21">&nbsp;</td>
+						<td id="s22">&nbsp;</td>
+						<td id="s23">&nbsp;</td>
+						<td id="s24">&nbsp;</td>
+						<td id="s25">&nbsp;</td>
+					</tr>
+				</table>
+				<br/>
+				<input type = "button" id = "new_game_random" onclick = "initRandom()" value = "New Game (random)" style="margin:5px" />
+				<input type = "button" id = "new_game_specify" onclick = "initSpecified()" value = "New Game (specified)" style="margin-left:5px"/>
+				<br/>
+				<input type = "button" id = "won_button" onclick = "i_won_click()" value = "I WON" style="margin-left:60px"/>
+				<input type = "button" id = "lost_button" onclick = "lost()" value = "I LOST" style="margin-left:60px"/>
+			</div>
+			<div class="column">
+				<h2>Score board:</h2>
+				<h3>
+					won: <input type="text" id="won" value='0' readonly="readonly" size="7">
+					<br/>
+					lost:  <input type="text" id="lost" value='0' readonly="readonly" size="7">
+				</h3>
+			</div>
+		</div>
+	</body>
+	<script>
+		document.getElementById("theTable").addEventListener("click", function(){clickCell(event)}, false);
+		window.onload = pageLoad;
+	</script>
+</html>

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Cancel Event{% endblock %}
+{% block body %}
+  <h2>Cancel Event</h2>
+  <h3>Hi {{ g.user.username }}, which event do you want to cancel?</h3>
+  <ul class="events">
+    {% for event in events %}
+    <li>{{ event.title }}
+       <dd>Host: <a href="{{ url_for('user_events', username=event.holder.username) }}">{{ event.holder.username }}</a>
+      <dd>description: {{event.description}}</dd>
+      <dd>start date: {{event.start_date}}</dd>
+      <dd>end date: {{event.end_date}}</dd>
+      <dd><a href="{{ url_for('cancel_event', title=event.title) }}" onclick="return confirm('Are you sure you want to delete this event?');">Cancel</a>
+    </li></br>
+    {% else %}
+    <li><em>There's no event so far.</em></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

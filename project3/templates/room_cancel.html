@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Cancel Event{% endblock %}
+{% block body %}
+  <h2>Cancel Event</h2>
+  <h3>Hi {{ g.user.username }}, which Chatroom do you want to cancel?</h3>
+  <ul class="events">
+    {% for room in rooms %}
+    <li>
+    	<a href="{{ url_for('cancel', title=room.title) }}" onclick="return confirm('Are you sure you want to delete the room?')"> {{ room.title }} </a>  
+    </li></br>
+    {% else %}
+    <li><em>There's no event so far.</em></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

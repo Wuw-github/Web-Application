@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2> Public Chatrooms </h2>
+  <table class="rooms">
+    <ul>
+    {% for room in rooms %}
+      <li> 
+        <a href="{{ url_for('chatroom', chatroom=room.title) }}">{{ room.title }}</a>
+      </li>
+    {% else %}
+      <tr><em>There's no Chatroom so far.</em>
+    {% endfor %}
+  </ul>
+  </table>
+{% endblock %}

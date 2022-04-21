@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  {% if request.endpoint == 'user_events' or not g.user %}
+    {% if not g.user %}
+      <h2>Public Events</h2>
+    {% else %}
+      <h2>{{ profile_user.username }}'s Events</h2>
+    {% endif %}
+    <ul class="events">
+      {% for event in events %}
+        <li>{{ event.title }}
+            <dd>Host: <a href="{{ url_for('user_events', username=event.holder.username) }}">{{ event.holder.username }}</a>
+          <dd>description: {{event.description}}</dd>
+          <dd>start date: {{event.start_date}}</dd>
+          <dd>end date: {{event.end_date}}</dd>
+          {% if g.user %}
+            {% if event.event_id in events_hold %}
+            <dd><a href="{{ url_for('cancel_event', title=event.title) }}" onclick="return confirm('Are you sure you want to delete this event?');">cancel</a>
+            {% else%}
+            <dd><a href="{{ url_for('register_event', username=event.holder.username, title=event.title) }}">register</a> | 
+              <a href="{{ url_for('unregister_event', username=event.holder.username, title=event.title) }}">unregister </a></dd>
+            {% endif %}
+          {% endif %}
+        </li></br>
+      {% else %}
+        <li><em>There's no event so far.</em>
+      {% endfor %}
+    </ul>
+  {% else %}
+      <div class="row">
+        <div class="column">
+          <h2> Public Events</h2>
+          <ul class="events">
+          {% for event in events %}
+            <li>{{ event.title }}
+            <dd>Host: <a href="{{ url_for('user_events', username=event.holder.username) }}">{{ event.holder.username }}</a>
+            <dd>description: {{event.description}}</dd>
+            <dd>start date: {{event.start_date}}</dd>
+            <dd>end date: {{event.end_date}}</dd>
+              {% if event.event_id in events_id_hold %}
+              <dd><a href="{{ url_for('cancel_event', title=event.title) }}" onclick="return confirm('Are you sure you want to delete this event?');">cancel</a>
+              {% else%}
+              <dd><a href="{{ url_for('register_event', username=event.holder.username, title=event.title) }}">register</a> | 
+                <a href="{{ url_for('unregister_event', username=event.holder.username, title=event.title) }}">unregister</a></dd>
+              {% endif %}
+            </li></br>
+          {% else %}
+            <em>There's no event so far.</em>
+          {% endfor %}
+        </div>
+
+        <div class="column">
+          <h2> Events </h2>
+          <ul class="events">
+          <h3>My events</h3>
+          {% for event in events_hold %}
+            <li>{{ event.title }}
+            <dd>Host: <a href="{{ url_for('user_events', username=event.holder.username) }}">{{ event.holder.username }}</a>
+            <dd>description: {{event.description}}</dd>
+            <dd>start date: {{event.start_date}}</dd>
+            <dd>end date: {{event.end_date}}</dd>
+            <dd><a href="{{ url_for('cancel_event', title=event.title) }}" onclick="return confirm('Are you sure you want to delete this event?');">cancel</a>
+            </li></br>
+          {% else %}
+            <em>There's no event so far.</em>
+          {% endfor %}
+
+            <h3>Upcoming attending events</h3>
+          {% for event in my_events %}
+            <li>{{ event.title }}
+            <dd>Host: <a href="{{ url_for('user_events', username=event.holder.username) }}">{{ event.holder.username }}</a>
+            <dd>description: {{event.description}}</dd>
+            <dd>start date: {{event.start_date}}</dd>
+            <dd>end date: {{event.end_date}}</dd>
+            <dd><a href="{{ url_for('register_event', username=event.holder.username, title=event.title) }}">register</a> | 
+            <a href="{{ url_for('unregister_event', username=event.holder.username, title=event.title) }}">unregister</a></dd>
+            </li></br>
+          {% else %}
+            <em>There's no event so far.</em>
+          {% endfor %}
+        </div>
+      </div>
+  {% endif %}
+{% endblock %}
